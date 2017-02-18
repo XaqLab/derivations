@@ -1,0 +1,151 @@
+\documentclass[12pt]{article}
+%\usepackage{times}
+\usepackage{color}
+\usepackage{multirow}
+\usepackage[tight,footnotesize]{subfigure}
+\usepackage{sectsty}
+\usepackage{titlesec}
+\usepackage{authblk}
+\usepackage[cm]{fullpage}
+\usepackage{latexsym, bm, amsmath, amssymb, amsthm, bbm, epsf, graphicx}
+\usepackage{import}
+\usepackage{float}
+\usepackage{color}
+\usepackage{cite}
+\usepackage{array}
+\usepackage{mdwmath}
+\usepackage{mdwtab}
+\usepackage{eqparbox}
+\usepackage[tight,footnotesize]{subfigure}
+\usepackage{rotating}
+\usepackage{bbm}
+\usepackage{latexsym}
+
+
+\import{/Users/xaq/Code/TeX/}{TeX_definitions.tex}
+
+
+
+
+\title{\bf Gabor overlaps}
+\author[1,2]{Xaq Pitkow}
+\affil[1]{Rice University, Department of Electrical and Computer Engineering}
+\affil[2]{Baylor College of Medicine, Department of Neuroscience}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+
+
+This note computes the overlap between two Gabor functions. Gabors are defined as a sinusoid modulated by a gaussian envelope:
+\be
+g(\vx|\vmu,\sigma^2,\vk,\phi)=\exp{\left(-\frac{|\vx-\vmu|^2}{2\sigma^2}\right)}\cos{\left(\vk\cdot(\vx-\vmu)+\phi\right)}
+\ee
+We often want to compute the overlap between two Gabor functions,
+\be
+G_{mn}=\int d\vx\,g_m(\vx)g_n(\vx)
+\label{eq:overlap}
+\ee
+where each Gabor has its own parameters $g_m(\vx)=g(\vx|\vmu_m,\sigma^2_m,\vk_m,\phi_m)$. For example, one Gabor might be a linear receptive field and the other might be a visual image.
+
+To compute this integral, it is convenient to use complex exponentials instead of sines and cosines, $\cos{t}=\Re[e^{it}]=\frac{1}{2}(e^{it}+e^{-it})$. The real part of a product of complex exponentials is
+\begin{align}
+\Re[u v]&=\frac{1}{4}(u+\bar{u})(v+\bar{v})\\
+&=\frac{1}{4}(uv+\bar{u}v+u\bar{v}+\bar{u}\bar{v})\\
+&=\frac{1}{4}((uv+\overline{uv})+(u\bar{v}+\overline{u\bar{v}})\\
+&=\frac{1}{2}(\Re[uv]+\Re[u\bar{v}])
+\label{eq:productcomplex}
+\end{align}
+This means that to compute the overlap (\ref{eq:overlap}), we can define a complex Gabor
+\be
+h(\vx|\vmu,\sigma^2,\vk,\phi)=\exp{\left(-\frac{|\vx-\vmu|^2}{2\sigma^2}+i\left(\vk\cdot(\vx-\vmu)+\phi\right)\right)}
+\ee
+and then compute the complex overlaps
+\be
+H_{mn}=\int d\vx\,h_m(\vx)h_n(\vx)
+\ee
+Using this overlap with (\ref{eq:productcomplex}), we can compute
+\be
+G_{mn}=\tfrac{1}{2}(\Re[H_{mn}]+\Re[H_{m\bar{n}}])
+\ee
+where $H_{m\bar{n}}=\int d\vx\,h_m(\vx)\bar{h}_n(\vx)$, and the only difference between $h$ and $\bar{h}$ is that $\vk\to -\vk$ and $\phi\to -\phi$. Thus once we have one general $H_{mn}$, we can transform it to compute the target integral $G_{mn}$.
+
+To compute $H_{mn}$, notice that the product of two complex gabors is yet another complex gabor,
+\begin{align}
+h_m(\vx)h_n(\vx) &= \exp{\left(-\frac{|\vx-\vmu_m|^2}{2\sigma_m^2}-\frac{|\vx-\vmu_n|^2}{2\sigma_n^2}+i\left(\vk_m\cdot(\vx-\vmu_m)+\phi_m+\vk_n\cdot(\vx-\vmu_n)+\phi_n\right)\right)}\\
+&=\exp{\left(-\frac{1}{2}a |\vx|^2+\vb\cdot\vx+c\right)}
+\label{eq:basicform}
+\end{align}
+where we have defined
+\begin{align}
+a&=\frac{1}{\sigma_m^2}+\frac{1}{\sigma_n^2}\\
+\vb&=\frac{\vmu_m}{\sigma_m^2}+\frac{\vmu_n}{\sigma_n^2}+i\vk_m+i\vk_n\\
+c&=-\frac{|\vmu_m|^2}{2\sigma_m^2}-\frac{|\vmu_n|^2}{2\sigma_n^2}+i\phi_m-i\vk_m\cdot\vmu_m+i\phi_n-i\vk_n\cdot\vmu_n
+\end{align}
+We can complete the square in form (\ref{eq:basicform}),
+\be
+h_m(\vx)h_n(\vx) = \exp{\left(-\frac{1}{2}a |\vx-\vb/a|^2\right)}\exp{\left(c+\frac{|\vb|^2}{2a}\right)}
+\ee
+and this form can be readily integrated to give
+\be
+H_{mn}=\int d\vx\, h_m(\vx)h_n(\vx)=\frac{2\pi}{a}\exp{\left(c+\frac{|\vb|^2}{2a}\right)}
+\ee
+where $|\vb|^2=\vb\cdot\vb$. Note that this magnitude is a {\it vector} magnitude, and {\it not} a complex magnitude $\vb\cdot\bar{\vb}$, so it can therefore still have an imaginary part.
+
+Now we have to unpack the variables $a,\vb,c$. The magnitude $|\vb|^2$ is
+\be
+|\vb|^2=\left|\frac{\vmu_m}{\sigma_m^2}+\frac{\vmu_n}{\sigma_n^2}\right|^2-\left|\vk_m+\vk_n\right|^2+2i \left(\frac{\vmu_m}{\sigma_m^2}+\frac{\vmu_n}{\sigma_n^2}\right)\cdot\left(\vk_m+\vk_n\right)
+\ee
+Separating the argument of the exponential into real and imaginary parts, we find
+\begin{align}
+c+\frac{|\vb|^2}{2a}=&\left[-\frac{|\vmu_m|^2}{2\sigma_m^2}-\frac{|\vmu_n|^2}{2\sigma_n^2}
++\frac{1}{2}\left(\left|\frac{\vmu_m}{\sigma_m^2}+\frac{\vmu_n}{\sigma_n^2}\right|^2
+-\left|\vk_m+\vk_n\right|^2\right)\left(\frac{1}{\sigma_m^2}+\frac{1}{\sigma_n^2}\right)^{-1}\right]\\
+&+i\left[\left(\phi_m-\vk_m\cdot\vmu_m\right)+\left(\phi_n-\vk_n\cdot\vmu_n\right)+\left(\frac{\vmu_m}{\sigma_m^2}+\frac{\vmu_n}{\sigma_n^2}\right)\cdot\left(\vk_m+\vk_n\right)\left(\frac{1}{\sigma_m^2}+\frac{1}{\sigma_n^2}\right)^{-1}\right]\\
+=&s+it
+\end{align}
+Using the real part of the exponential involving this term, we have
+\begin{align}
+\Re[H_{mn}]=&\frac{2\pi}{a}e^s\cos{t}\\
+=&\frac{2\pi}{\sigma_m^{-2}+\sigma_n^{-2}}\exp{\left[-\frac{|\vmu_m|^2}{2\sigma_m^2}-\frac{|\vmu_n|^2}{2\sigma_n^2}
++\frac{1}{2}\left(\left|\frac{\vmu_m}{\sigma_m^2}+\frac{\vmu_n}{\sigma_n^2}\right|^2
+-\left|\vk_m+\vk_n\right|^2\right)\left(\frac{1}{\sigma_m^2}+\frac{1}{\sigma_n^2}\right)^{-1}\right]}\\
+&\cdot\cos{\left[\left(\phi_m-\vk_m\cdot\vmu_m\right)+\left(\phi_n-\vk_n\cdot\vmu_n\right)+\left(\frac{\vmu_m}{\sigma_m^2}+\frac{\vmu_n}{\sigma_n^2}\right)\cdot\left(\vk_m+\vk_n\right)\left(\frac{1}{\sigma_m^2}+\frac{1}{\sigma_n^2}\right)^{-1}\right]}
+\end{align}
+The same thing holds for the term $H_{m\bar{n}}$ but with $\vk_n\to-\vk_n$ and $\phi_n\to-\phi_n$, giving
+\begin{align}
+G_{mn}=&\tfrac{1}{2}(\Re[H_{mn}]+\Re[H_{mn}])\\
+=&\frac{\pi}{\sigma_m^{-2}+\sigma_n^{-2}}\exp{\left[-\frac{|\vmu_m|^2}{2\sigma_m^2}-\frac{|\vmu_n|^2}{2\sigma_n^2}
++\frac{1}{2}\left|\frac{\vmu_m}{\sigma_m^2}+\frac{\vmu_n}{\sigma_n^2}\right|^2 \left(\frac{1}{\sigma_m^2}+\frac{1}{\sigma_n^2}\right)^{-1}\right]}\\
+&\left(
+\exp{\left[
+-\tfrac{1}{2}\frac{\left|\vk_m{\color{red}+}\vk_n\right|^2}{\sigma_m^{-2}+\sigma_n^{-2}}
+\right]}
+\cos{\left[
+\left(\phi_m-\vk_m\cdot\vmu_m\right){\color{red}+}\left(\phi_n-\vk_n\cdot\vmu_n\right)+\frac{\left(\frac{\vmu_m}{\sigma_m^2}+\frac{\vmu_n}{\sigma_n^2}\right)\cdot\left(\vk_m{\color{red}+}\vk_n\right)}
+{\sigma_m^{-2}+\sigma_n^{-2}}
+\right]}
+\right.\\
+&\left.
++\exp{\left[
+-\tfrac{1}{2}\frac{\left|\vk_m{\color{red}-}\vk_n\right|^2}{\sigma_m^{-2}+\sigma_n^{-2}}
+\right]}
+\cos{\left[
+\left(\phi_m-\vk_m\cdot\vmu_m\right){\color{red}-}\left(\phi_n-\vk_n\cdot\vmu_n\right)+\frac{\left(\frac{\vmu_m}{\sigma_m^2}+\frac{\vmu_n}{\sigma_n^2}\right)\cdot\left(\vk_m{\color{red}-}\vk_n\right)}
+{\sigma_m^{-2}+\sigma_n^{-2}}
+\right]}
+\right)
+\end{align}
+where changes between the two terms have been highlighted in color.
+
+I have checked this derivation against numerical integration and the two quantities agree.
+
+
+
+
+
+\end{document}
+
+
